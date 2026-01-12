@@ -13,7 +13,7 @@ let user = tg.initDataUnsafe?.user || {
 const GAME_CONFIG = {
     duration: 45, // секунд (изменено с 60 на 45)
     spawnInterval: { min: 400, max: 900 }, // мс между появлениями
-    itemLifetime: { min: 3000, max: 5000 }, // время жизни предмета
+    itemLifetime: { min: 3000, max: 4800 }, // время жизни предмета
     maxItemsOnScreen: 12,
     
     items: {
@@ -45,40 +45,15 @@ let gameState = {
     countdownTimer: null
 };
 
-// ===== КОНФИГУРАЦИЯ API =====
-const API_URL = "http://31.130.131.180:8001";  // ЗАМЕНИТЕ НА IP ВАШЕГО СЕРВЕРА!
-const USE_API = false; 
-
-// ===== СОХРАНЕНИЕ РЕЗУЛЬТАТОВ (ГЛОБАЛЬНАЯ ТАБЛИЦА) =====
-aasync function saveScore(score) {
-    // Сначала сохраняем локально
-    saveScoreLocally(score);
+// ===== ЛОКАЛЬНОЕ ХРАНИЛИЩЕ РЕЗУЛЬТАТОВ =====
+function saveScore(score) {
+    const scores = getScores();
     
-    // Пробуем API только если включен
-    if (typeof USE_API !== 'undefined' && USE_API) {
-        try {
-            await fetch(`${API_URL}/api/save_score`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    userId: user.id,
-                    userName: user.first_name,
-                    score: score
-                })
-            });
-        } catch (e) {
-            console.log('API недоступен');
-        }
-    }
-}
-
-// Локальное сохранение (резервное)
-function saveScoreLocally(score) {
-    const scores = getScoresLocally();
-    
+    // Ищем существующий результат этого пользователя
     const existingIndex = scores.findIndex(s => s.userId === user.id);
     
     if (existingIndex !== -1) {
+        // Если новый результат лучше - обновляем
         if (score > scores[existingIndex].score) {
             scores[existingIndex] = {
                 userId: user.id,
@@ -86,22 +61,34 @@ function saveScoreLocally(score) {
                 score: score,
                 date: new Date().toISOString()
             };
+            console.log(`Обновлен рекорд пользователя ${user.id}: ${score}`);
+        } else {
+            console.log(`Результат ${score} не побил рекорд ${scores[existingIndex].score}`);
         }
     } else {
+        // Новый игрок - добавляем результат
         scores.push({
             userId: user.id,
             userName: user.first_name,
             score: score,
             date: new Date().toISOString()
         });
+        console.log(`Добавлен новый игрок ${user.id} с результатом ${score}`);
     }
     
+    // Сортируем по убыванию очков
     scores.sort((a, b) => b.score - a.score);
-    localStorage.setItem('game_scores_local', JSON.stringify(scores));
+    
+    // Храним только топ-100
+    if (scores.length > 100) {
+        scores.length = 100;
+    }
+    
+    localStorage.setItem('game_scores', JSON.stringify(scores));
 }
 
-function getScoresLocally() {
-    const stored = localStorage.getItem('game_scores_local');
+function getScores() {
+    const stored = localStorage.getItem('game_scores');
     return stored ? JSON.parse(stored) : [];
 }
 
@@ -417,10 +404,6 @@ function showResults() {
 
 async function showLeaderboard() {
     const leaderboardList = document.getElementById('leaderboard-list');
-	 if (typeof USE_API === 'undefined' || !USE_API) {
-        showLocalLeaderboard();
-        return;
-    }
     leaderboardList.innerHTML = '<div class="loading">Загрузка...</div>';
     
     showScreen('leaderboard-screen');
@@ -588,34 +571,4 @@ window.addEventListener('beforeunload', () => {
         endGame();
     }
 });
-function showLocalLeaderboard() {
-    const leaderboardList = document.getElementById('leaderboard-list');
-    const localScores = getScoresLocally();
-    
-    showScreen('leaderboard-screen');
-    
-    if (localScores.length === 0) {
-        leaderboardList.innerHTML = '<div class="loading">Пока нет результатов</div>';
-        return;
-    }
-    
-    leaderboardList.innerHTML = '';
-    localScores.forEach((score, index) => {
-        const item = document.createElement('div');
-        item.className = 'leaderboard-item';
-        if (score.userId === user.id) item.classList.add('current-user');
-        
-        const rankClass = index === 0 ? 'top1' : index === 1 ? 'top2' : index === 2 ? 'top3' : '';
-        
-        item.innerHTML = `
-            <div class="leaderboard-rank ${rankClass}">${index + 1}</div>
-            <div class="leaderboard-info">
-                <div class="leaderboard-name">${score.userName}</div>
-                <div class="leaderboard-date">${new Date(score.date).toLocaleDateString('ru-RU')}</div>
-            </div>
-            <div class="leaderboard-score">${score.score}</div>
-        `;
-        leaderboardList.appendChild(item);
-    });
-}
 
