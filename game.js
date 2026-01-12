@@ -181,8 +181,8 @@ function spawnItem() {
     const element = document.createElement('div');
     element.className = 'game-item';
     element.textContent = item.emoji;
-    element.style.left = Math.random() * (areaRect.width - 120) + 'px';
-    element.style.top = Math.random() * (areaRect.height - 120) + 'px';
+    element.style.left = Math.random() * (areaRect.width - 60) + 'px';
+    element.style.top = Math.random() * (areaRect.height - 60) + 'px';
     
     // Обработчик клика
     element.addEventListener('click', () => handleItemClick(item, element));
@@ -227,13 +227,6 @@ function handleItemClick(item, element) {
     // Анимация клика
     element.classList.add('clicked');
     
-    // Воспроизведение звука
-    if (item.points > 0) {
-        playSound('click-sound');
-    } else {
-        playSound('wrong-sound');
-    }
-    
     // Обновление очков
     const points = item.points;
     let newScore = gameState.score + points;
@@ -249,6 +242,13 @@ function handleItemClick(item, element) {
     
     // Удаление предмета
     removeItem(element);
+    
+    // Воспроизведение звука
+    if (points > 0) {
+        playSound('click-sound');
+    } else {
+        playSound('wrong-sound');
+    }
     
     // Вибрация в зависимости от очков
     if (tg.HapticFeedback) {
@@ -319,11 +319,11 @@ function showResults() {
         message = '🤔 Попробуйте еще раз!';
     } else if (finalScore < 10) {
         message = '💪 Неплохо для начала!';
-    } else if (finalScore < 20) {
-        message = '👍 Хороший результат!';
     } else if (finalScore < 30) {
-        message = '🔥 Отличная игра!';
+        message = '👍 Хороший результат!';
     } else if (finalScore < 40) {
+        message = '🔥 Отличная игра!';
+    } else if (finalScore < 50) {
         message = '⭐ Невероятно!';
     } else {
         message = '🏆 Вы легенда!';
@@ -389,25 +389,27 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('User:', user);
 });
 
-// ===== ОБРАБОТКА ЗАКРЫТИЯ =====
-window.addEventListener('beforeunload', () => {
-    if (gameState.isPlaying) {
-        endGame();
-    }
-	
 // ===== ЗВУКИ =====
 function playSound(soundId) {
     try {
         const audio = document.getElementById(soundId);
         if (audio) {
             audio.currentTime = 0; // Сброс на начало
+            audio.volume = 0.3; // Громкость 30%
             audio.play().catch(e => {
-                console.log('Автовоспроизведение заблокировано:', e);
+                // Автовоспроизведение может быть заблокировано браузером
+                console.log('Звук заблокирован браузером (это нормально)');
             });
         }
     } catch (e) {
         console.error('Ошибка воспроизведения звука:', e);
     }
-}	
-	
+}
+
+// ===== ОБРАБОТКА ЗАКРЫТИЯ =====
+window.addEventListener('beforeunload', () => {
+    if (gameState.isPlaying) {
+        endGame();
+    }
 });
+

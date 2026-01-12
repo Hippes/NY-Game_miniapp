@@ -7,7 +7,6 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
     <!-- Экран меню -->
     <div id="menu-screen" class="screen active">
@@ -29,7 +28,7 @@
                     <span class="emoji">🍌 🍩 🍍 ⏰</span>
                     <span class="points">-1 очко</span>
                 </div>
-                <p class="time-info">⏱ Время раунда: 60 секунд</p>
+                <p class="time-info">⏱ Время раунда: 45 секунд</p>
             </div>
             
             <button class="btn btn-primary" id="start-btn">🎮 Начать игру</button>
@@ -85,12 +84,11 @@
             <button class="btn btn-secondary" id="back-from-leaderboard-btn">🏠 Назад</button>
         </div>
     </div>
-	
-<!-- Звуки  -->
-	<audio id="click-sound" src="click.mp3" preload="auto"></audio>
+
+    <!-- Звуки -->
+    <audio id="click-sound" src="click.mp3" preload="auto"></audio>
     <audio id="wrong-sound" src="wrong.mp3" preload="auto"></audio>
 
     <script src="game.js"></script>
-	
 </body>
 </html>
