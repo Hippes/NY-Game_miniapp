@@ -61,9 +61,9 @@ function saveScore(score) {
                 score: score,
                 date: new Date().toISOString()
             };
-            logger.info(`Обновлен рекорд пользователя ${user.id}: ${score}`);
+            console.log(`Обновлен рекорд пользователя ${user.id}: ${score}`);
         } else {
-            logger.info(`Результат ${score} не побил рекорд ${scores[existingIndex].score}`);
+            console.log(`Результат ${score} не побил рекорд ${scores[existingIndex].score}`);
         }
     } else {
         // Новый игрок - добавляем результат
@@ -73,7 +73,7 @@ function saveScore(score) {
             score: score,
             date: new Date().toISOString()
         });
-        logger.info(`Добавлен новый игрок ${user.id} с результатом ${score}`);
+        console.log(`Добавлен новый игрок ${user.id} с результатом ${score}`);
     }
     
     // Сортируем по убыванию очков
