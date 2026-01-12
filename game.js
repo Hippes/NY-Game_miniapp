@@ -50,38 +50,25 @@ const API_URL = "http://31.130.131.180:8001";  // ЗАМЕНИТЕ НА IP ВА�
 const USE_API = false; 
 
 // ===== СОХРАНЕНИЕ РЕЗУЛЬТАТОВ (ГЛОБАЛЬНАЯ ТАБЛИЦА) =====
-async function saveScore(score) {
-    try {
-        // Отправляем на сервер
-        const response = await fetch(`${API_URL}/api/save_score`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                userId: user.id,
-                userName: user.first_name,
-                score: score
-            })
-        });
-        
-        if (response.ok) {
-            const result = await response.json();
-            console.log('Результат сохранен на сервере:', result);
-            
-            // Также сохраняем локально (для офлайн режима)
-            saveScoreLocally(score);
-            
-            return result;
-        } else {
-            console.error('Ошибка сохранения на сервере');
-            // Сохраняем хотя бы локально
-            saveScoreLocally(score);
+aasync function saveScore(score) {
+    // Сначала сохраняем локально
+    saveScoreLocally(score);
+    
+    // Пробуем API только если включен
+    if (typeof USE_API !== 'undefined' && USE_API) {
+        try {
+            await fetch(`${API_URL}/api/save_score`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: user.id,
+                    userName: user.first_name,
+                    score: score
+                })
+            });
+        } catch (e) {
+            console.log('API недоступен');
         }
-    } catch (error) {
-        console.error('Ошибка отправки на сервер:', error);
-        // Сохраняем локально если сервер недоступен
-        saveScoreLocally(score);
     }
 }
 
@@ -430,6 +417,10 @@ function showResults() {
 
 async function showLeaderboard() {
     const leaderboardList = document.getElementById('leaderboard-list');
+	 if (typeof USE_API === 'undefined' || !USE_API) {
+        showLocalLeaderboard();
+        return;
+    }
     leaderboardList.innerHTML = '<div class="loading">Загрузка...</div>';
     
     showScreen('leaderboard-screen');
@@ -597,4 +588,34 @@ window.addEventListener('beforeunload', () => {
         endGame();
     }
 });
+function showLocalLeaderboard() {
+    const leaderboardList = document.getElementById('leaderboard-list');
+    const localScores = getScoresLocally();
+    
+    showScreen('leaderboard-screen');
+    
+    if (localScores.length === 0) {
+        leaderboardList.innerHTML = '<div class="loading">Пока нет результатов</div>';
+        return;
+    }
+    
+    leaderboardList.innerHTML = '';
+    localScores.forEach((score, index) => {
+        const item = document.createElement('div');
+        item.className = 'leaderboard-item';
+        if (score.userId === user.id) item.classList.add('current-user');
+        
+        const rankClass = index === 0 ? 'top1' : index === 1 ? 'top2' : index === 2 ? 'top3' : '';
+        
+        item.innerHTML = `
+            <div class="leaderboard-rank ${rankClass}">${index + 1}</div>
+            <div class="leaderboard-info">
+                <div class="leaderboard-name">${score.userName}</div>
+                <div class="leaderboard-date">${new Date(score.date).toLocaleDateString('ru-RU')}</div>
+            </div>
+            <div class="leaderboard-score">${score.score}</div>
+        `;
+        leaderboardList.appendChild(item);
+    });
+}
 
