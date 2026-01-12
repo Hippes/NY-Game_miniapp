@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 # Конфигурация
 BOT_TOKEN = "8372625344:AAGVbxGAbrz6bquGDwJ6pSJaYOPZFNfriPI"  # Замените на токен вашего бота
-WEBAPP_URL = "https://your-game.vercel.app"  # URL вашей игры после деплоя
+WEBAPP_URL = "https://ny-game-miniapp.vercel.app/"  # URL вашей игры после деплоя
 
 # Инициализация бота
 bot = Bot(token=BOT_TOKEN)
