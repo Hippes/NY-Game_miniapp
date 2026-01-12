@@ -206,10 +206,10 @@ function getRandomItem() {
     const rand = Math.random();
     let itemType;
     
-    if (rand < 0.1) {
+    if (rand < 0.6) {
         // 10% шанс премиум предмета
         itemType = 'premium';
-    } else if (rand < 0.6) {
+    } else if (rand < 0.1) {
         // 50% шанс хорошего предмета
         itemType = 'good';
     } else {
