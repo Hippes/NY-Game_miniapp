@@ -388,3 +388,8 @@ window.addEventListener('beforeunload', () => {
         endGame();
     }
 });
+
+// ===== Звуки в игре =====
+function playSound(soundId) {
+    document.getElementById(soundId).play();
+}
