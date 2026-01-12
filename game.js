@@ -47,6 +47,7 @@ let gameState = {
 
 // ===== КОНФИГУРАЦИЯ API =====
 const API_URL = "http://31.130.131.180:8001";  // ЗАМЕНИТЕ НА IP ВАШЕГО СЕРВЕРА!
+const USE_API = false; 
 
 // ===== СОХРАНЕНИЕ РЕЗУЛЬТАТОВ (ГЛОБАЛЬНАЯ ТАБЛИЦА) =====
 async function saveScore(score) {
