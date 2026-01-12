@@ -11,7 +11,7 @@ let user = tg.initDataUnsafe?.user || {
 
 // ===== КОНФИГУРАЦИЯ ИГРЫ =====
 const GAME_CONFIG = {
-    duration: 45, // секунд
+    duration: 60, // секунд
     spawnInterval: { min: 300, max: 800 }, // мс между появлениями
     itemLifetime: { min: 2000, max: 4000 }, // время жизни предмета
     maxItemsOnScreen: 15,
@@ -48,14 +48,35 @@ let gameState = {
 // ===== ЛОКАЛЬНОЕ ХРАНИЛИЩЕ РЕЗУЛЬТАТОВ =====
 function saveScore(score) {
     const scores = getScores();
-    const newScore = {
-        userId: user.id,
-        userName: user.first_name,
-        score: score,
-        date: new Date().toISOString()
-    };
     
-    scores.push(newScore);
+    // Ищем существующий результат этого пользователя
+    const existingIndex = scores.findIndex(s => s.userId === user.id);
+    
+    if (existingIndex !== -1) {
+        // Если новый результат лучше - обновляем
+        if (score > scores[existingIndex].score) {
+            scores[existingIndex] = {
+                userId: user.id,
+                userName: user.first_name,
+                score: score,
+                date: new Date().toISOString()
+            };
+            logger.info(`Обновлен рекорд пользователя ${user.id}: ${score}`);
+        } else {
+            logger.info(`Результат ${score} не побил рекорд ${scores[existingIndex].score}`);
+        }
+    } else {
+        // Новый игрок - добавляем результат
+        scores.push({
+            userId: user.id,
+            userName: user.first_name,
+            score: score,
+            date: new Date().toISOString()
+        });
+        logger.info(`Добавлен новый игрок ${user.id} с результатом ${score}`);
+    }
+    
+    // Сортируем по убыванию очков
     scores.sort((a, b) => b.score - a.score);
     
     // Храним только топ-100
@@ -111,6 +132,9 @@ function startGame() {
     // Показ игрового экрана
     showScreen('game-screen');
     
+    // Запуск фоновой музыки
+    playBackgroundMusic();
+    
     // Запуск таймеров
     startSpawning();
     startCountdown();
@@ -127,6 +151,9 @@ function endGame() {
     // Остановка таймеров
     clearInterval(gameState.spawnTimer);
     clearInterval(gameState.countdownTimer);
+    
+    // Остановка фоновой музыки
+    stopBackgroundMusic();
     
     // Удаление всех предметов
     gameState.itemsOnScreen.forEach(item => {
@@ -319,11 +346,11 @@ function showResults() {
         message = '🤔 Попробуйте еще раз!';
     } else if (finalScore < 10) {
         message = '💪 Неплохо для начала!';
-    } else if (finalScore < 30) {
+    } else if (finalScore < 20) {
         message = '👍 Хороший результат!';
-    } else if (finalScore < 40) {
+    } else if (finalScore < 30) {
         message = '🔥 Отличная игра!';
-    } else if (finalScore < 50) {
+    } else if (finalScore < 40) {
         message = '⭐ Невероятно!';
     } else {
         message = '🏆 Вы легенда!';
@@ -403,6 +430,35 @@ function playSound(soundId) {
         }
     } catch (e) {
         console.error('Ошибка воспроизведения звука:', e);
+    }
+}
+
+// ===== ФОНОВАЯ МУЗЫКА =====
+function playBackgroundMusic() {
+    try {
+        const music = document.getElementById('background-music');
+        if (music) {
+            music.volume = 0.2; // Громкость 20% (тише чем звуки кликов)
+            music.currentTime = 0; // Начать с начала
+            music.play().catch(e => {
+                console.log('Фоновая музыка заблокирована браузером');
+                // Это нормально, музыка включится после первого клика
+            });
+        }
+    } catch (e) {
+        console.error('Ошибка воспроизведения музыки:', e);
+    }
+}
+
+function stopBackgroundMusic() {
+    try {
+        const music = document.getElementById('background-music');
+        if (music) {
+            music.pause();
+            music.currentTime = 0;
+        }
+    } catch (e) {
+        console.error('Ошибка остановки музыки:', e);
     }
 }
 
