@@ -227,6 +227,13 @@ function handleItemClick(item, element) {
     // Анимация клика
     element.classList.add('clicked');
     
+    // Воспроизведение звука
+    if (item.points > 0) {
+        playSound('click-sound');
+    } else {
+        playSound('wrong-sound');
+    }
+    
     // Обновление очков
     const points = item.points;
     let newScore = gameState.score + points;
@@ -387,9 +394,20 @@ window.addEventListener('beforeunload', () => {
     if (gameState.isPlaying) {
         endGame();
     }
-});
-
-// ===== Звуки в игре =====
+	
+// ===== ЗВУКИ =====
 function playSound(soundId) {
-    document.getElementById(soundId).play();
-}
+    try {
+        const audio = document.getElementById(soundId);
+        if (audio) {
+            audio.currentTime = 0; // Сброс на начало
+            audio.play().catch(e => {
+                console.log('Автовоспроизведение заблокировано:', e);
+            });
+        }
+    } catch (e) {
+        console.error('Ошибка воспроизведения звука:', e);
+    }
+}	
+	
+});
