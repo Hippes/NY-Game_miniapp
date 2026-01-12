@@ -11,7 +11,7 @@ let user = tg.initDataUnsafe?.user || {
 
 // ===== КОНФИГУРАЦИЯ ИГРЫ =====
 const GAME_CONFIG = {
-    duration: 20, // секунд
+    duration: 45, // секунд
     spawnInterval: { min: 300, max: 800 }, // мс между появлениями
     itemLifetime: { min: 2000, max: 4000 }, // время жизни предмета
     maxItemsOnScreen: 15,
@@ -206,10 +206,10 @@ function getRandomItem() {
     const rand = Math.random();
     let itemType;
     
-    if (rand < 0.6) {
+    if (rand < 0.1) {
         // 10% шанс премиум предмета
         itemType = 'premium';
-    } else if (rand < 0.1) {
+    } else if (rand < 0.6) {
         // 50% шанс хорошего предмета
         itemType = 'good';
     } else {
