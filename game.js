@@ -11,7 +11,7 @@ let user = tg.initDataUnsafe?.user || {
 
 // ===== КОНФИГУРАЦИЯ ИГРЫ =====
 const GAME_CONFIG = {
-    duration: 60, // секунд
+    duration: 20, // секунд
     spawnInterval: { min: 300, max: 800 }, // мс между появлениями
     itemLifetime: { min: 2000, max: 4000 }, // время жизни предмета
     maxItemsOnScreen: 15,
@@ -181,8 +181,8 @@ function spawnItem() {
     const element = document.createElement('div');
     element.className = 'game-item';
     element.textContent = item.emoji;
-    element.style.left = Math.random() * (areaRect.width - 90) + 'px';
-    element.style.top = Math.random() * (areaRect.height - 90) + 'px';
+    element.style.left = Math.random() * (areaRect.width - 60) + 'px';
+    element.style.top = Math.random() * (areaRect.height - 60) + 'px';
     
     // Обработчик клика
     element.addEventListener('click', () => handleItemClick(item, element));
