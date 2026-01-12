@@ -104,8 +104,23 @@ function getScores() {
 
 // ===== НАВИГАЦИЯ МЕЖДУ ЭКРАНАМИ =====
 function showScreen(screenId) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(screenId).classList.add('active');
+    console.log('showScreen вызвана для:', screenId);
+    
+    // Убираем active класс и скрываем все экраны
+    document.querySelectorAll('.screen').forEach(s => {
+        s.classList.remove('active');
+        s.style.display = 'none';
+    });
+    
+    // Показываем нужный экран
+    const targetScreen = document.getElementById(screenId);
+    if (targetScreen) {
+        targetScreen.style.display = 'flex';
+        targetScreen.classList.add('active');
+        console.log('Экран показан:', screenId);
+    } else {
+        console.error('Экран не найден:', screenId);
+    }
     
     // Вибрация при смене экрана
     if (tg.HapticFeedback) {
@@ -146,6 +161,9 @@ function startGame() {
 }
 
 function endGame() {
+    console.log('=== ОКОНЧАНИЕ ИГРЫ ===');
+    console.log('Финальный счет:', gameState.score);
+    
     gameState.isPlaying = false;
     
     // Остановка таймеров
@@ -166,8 +184,11 @@ function endGame() {
     // Сохранение результата
     saveScore(gameState.score);
     
+    console.log('Показываем результаты через 300мс...');
+    
     // Небольшая задержка перед показом результатов (для плавности)
     setTimeout(() => {
+        console.log('Вызов showResults()');
         showResults();
     }, 300);
     
@@ -339,8 +360,19 @@ function updateTimer(time) {
 }
 
 function showResults() {
+    console.log('=== ПОКАЗ РЕЗУЛЬТАТОВ ===');
+    console.log('Финальный счет:', gameState.score);
+    
     const finalScore = gameState.score;
-    document.getElementById('final-score').textContent = finalScore;
+    const finalScoreElement = document.getElementById('final-score');
+    const resultMessageElement = document.getElementById('result-message');
+    
+    if (!finalScoreElement || !resultMessageElement) {
+        console.error('Элементы результатов не найдены!');
+        return;
+    }
+    
+    finalScoreElement.textContent = finalScore;
     
     // Сообщение в зависимости от результата
     let message = '';
@@ -358,9 +390,26 @@ function showResults() {
         message = '🏆 Вы легенда!';
     }
     
-    document.getElementById('result-message').textContent = message;
+    resultMessageElement.textContent = message;
     
-    showScreen('result-screen');
+    console.log('Сообщение:', message);
+    console.log('Переключение на result-screen');
+    
+    // Принудительно скрываем все экраны
+    document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+        screen.style.display = 'none';
+    });
+    
+    // Показываем экран результатов
+    const resultScreen = document.getElementById('result-screen');
+    if (resultScreen) {
+        resultScreen.style.display = 'flex';
+        resultScreen.classList.add('active');
+        console.log('Экран результатов показан');
+    } else {
+        console.error('result-screen не найден!');
+    }
 }
 
 function showLeaderboard() {
