@@ -11,7 +11,7 @@ let user = tg.initDataUnsafe?.user || {
 
 // ===== КОНФИГУРАЦИЯ ИГРЫ =====
 const GAME_CONFIG = {
-    duration: 60, // секунд
+    duration: 45, // секунд (изменено с 60 на 45)
     spawnInterval: { min: 300, max: 800 }, // мс между появлениями
     itemLifetime: { min: 2000, max: 4000 }, // время жизни предмета
     maxItemsOnScreen: 15,
@@ -166,8 +166,10 @@ function endGame() {
     // Сохранение результата
     saveScore(gameState.score);
     
-    // Показ результатов
-    showResults();
+    // Небольшая задержка перед показом результатов (для плавности)
+    setTimeout(() => {
+        showResults();
+    }, 300);
     
     // Вибрация окончания
     if (tg.HapticFeedback) {
