@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Новогодний Клик 🎄</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Экран меню -->
+    <div id="menu-screen" class="screen active">
+        <div class="menu-container">
+            <h1 class="game-title">🎄 Новогодний Клик</h1>
+            <p class="game-description">Кликайте на новогодние предметы и набирайте очки!</p>
+            
+            <div class="instructions">
+                <h3>Как играть:</h3>
+                <div class="item-info good">
+                    <span class="emoji">🍬 🎅 🍊 🎄</span>
+                    <span class="points">+1 очко</span>
+                </div>
+                <div class="item-info premium">
+                    <span class="emoji">💧</span>
+                    <span class="points">+2 очка (редкий!)</span>
+                </div>
+                <div class="item-info bad">
+                    <span class="emoji">🍌 🍩 🍍 ⏰</span>
+                    <span class="points">-1 очко</span>
+                </div>
+                <p class="time-info">⏱ Время раунда: 60 секунд</p>
+            </div>
+            
+            <button class="btn btn-primary" id="start-btn">🎮 Начать игру</button>
+            <button class="btn btn-secondary" id="leaderboard-btn">🏆 Таблица лидеров</button>
+        </div>
+    </div>
+
+    <!-- Экран игры -->
+    <div id="game-screen" class="screen">
+        <div class="game-header">
+            <div class="score-container">
+                <span class="label">Очки:</span>
+                <span id="score" class="score">0</span>
+            </div>
+            <div class="timer-container">
+                <span class="label">⏱</span>
+                <span id="timer" class="timer">60</span>
+            </div>
+        </div>
+        
+        <div id="game-area" class="game-area"></div>
+    </div>
+
+    <!-- Экран результатов -->
+    <div id="result-screen" class="screen">
+        <div class="result-container">
+            <h2 class="result-title">🎉 Игра окончена!</h2>
+            <div class="final-score-container">
+                <p class="final-score-label">Ваш результат:</p>
+                <p class="final-score" id="final-score">0</p>
+                <p class="final-score-unit">очков</p>
+            </div>
+            
+            <div id="result-message" class="result-message"></div>
+            
+            <div class="result-buttons">
+                <button class="btn btn-primary" id="play-again-btn">🔄 Играть снова</button>
+                <button class="btn btn-secondary" id="show-leaderboard-btn">🏆 Таблица лидеров</button>
+                <button class="btn btn-tertiary" id="back-to-menu-btn">🏠 В меню</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Экран таблицы лидеров -->
+    <div id="leaderboard-screen" class="screen">
+        <div class="leaderboard-container">
+            <h2 class="leaderboard-title">🏆 Таблица лидеров</h2>
+            
+            <div id="leaderboard-list" class="leaderboard-list">
+                <div class="loading">Загрузка...</div>
+            </div>
+            
+            <button class="btn btn-secondary" id="back-from-leaderboard-btn">🏠 Назад</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
