@@ -181,8 +181,8 @@ function spawnItem() {
     const element = document.createElement('div');
     element.className = 'game-item';
     element.textContent = item.emoji;
-    element.style.left = Math.random() * (areaRect.width - 10) + 'px';
-    element.style.top = Math.random() * (areaRect.height - 10) + 'px';
+    element.style.left = Math.random() * (areaRect.width - 90) + 'px';
+    element.style.top = Math.random() * (areaRect.height - 90) + 'px';
     
     // Обработчик клика
     element.addEventListener('click', () => handleItemClick(item, element));
