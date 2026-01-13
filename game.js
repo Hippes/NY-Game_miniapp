@@ -12,9 +12,9 @@ let user = tg.initDataUnsafe?.user || {
 // ===== КОНФИГУРАЦИЯ ИГРЫ =====
 const GAME_CONFIG = {
     duration: 45, // секунд (изменено с 60 на 45)
-    spawnInterval: { min: 300, max: 800 }, // мс между появлениями
-    itemLifetime: { min: 2000, max: 4000 }, // время жизни предмета
-    maxItemsOnScreen: 15,
+    spawnInterval: { min: 400, max: 900 }, // мс между появлениями
+    itemLifetime: { min: 3000, max: 5000 }, // время жизни предмета
+    maxItemsOnScreen: 12,
     
     items: {
         good: [
@@ -79,9 +79,9 @@ function saveScore(score) {
     // Сортируем по убыванию очков
     scores.sort((a, b) => b.score - a.score);
     
-    // Храним только топ-100
-    if (scores.length > 100) {
-        scores.length = 100;
+    // Храним только топ-150
+    if (scores.length > 50) {
+        scores.length = 50;
     }
     
     localStorage.setItem('game_scores', JSON.stringify(scores));
@@ -378,13 +378,13 @@ function showResults() {
     let message = '';
     if (finalScore === 0) {
         message = '🤔 Попробуйте еще раз!';
-    } else if (finalScore < 10) {
-        message = '💪 Неплохо для начала!';
     } else if (finalScore < 20) {
-        message = '👍 Хороший результат!';
+        message = '💪 Неплохо для начала!';
     } else if (finalScore < 30) {
+        message = '👍 Хороший результат!';
+    } else if (finalScore < 50) {
         message = '🔥 Отличная игра!';
-    } else if (finalScore < 40) {
+    } else if (finalScore < 70) {
         message = '⭐ Невероятно!';
     } else {
         message = '🏆 Вы легенда!';
@@ -473,7 +473,7 @@ function playSound(soundId) {
         const audio = document.getElementById(soundId);
         if (audio) {
             audio.currentTime = 0; // Сброс на начало
-            audio.volume = 0.3; // Громкость 30%
+            audio.volume = 0.4; // Громкость 40%
             audio.play().catch(e => {
                 // Автовоспроизведение может быть заблокировано браузером
                 console.log('Звук заблокирован браузером (это нормально)');
@@ -489,7 +489,7 @@ function playBackgroundMusic() {
     try {
         const music = document.getElementById('background-music');
         if (music) {
-            music.volume = 0.2; // Громкость 20% (тише чем звуки кликов)
+            music.volume = 0.15; // Громкость 15% (тише чем звуки кликов)
             music.currentTime = 0; // Начать с начала
             music.play().catch(e => {
                 console.log('Фоновая музыка заблокирована браузером');
