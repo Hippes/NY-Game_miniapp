@@ -12,7 +12,7 @@ let user = tg.initDataUnsafe?.user || {
 // ===== КОНФИГУРАЦИЯ API (ГЛОБАЛЬНАЯ ТАБЛИЦА) =====
 const API_CONFIG = {
     enabled: true,  // ВЫКЛЮЧАТЕЛЬ: false = работает как раньше
-    url: "http://31.130.131.180:8001",
+    url: "/api/proxy",
     timeout: 5000
 };
 
