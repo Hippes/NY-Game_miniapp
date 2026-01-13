@@ -1,8 +1,12 @@
-// api/proxy.js - Vercel Serverless Function
-// Прокси для обхода Mixed Content (HTTPS → HTTP)
+// api/proxy.js - Vercel Serverless Function для прокси к API
+export const config = {
+    api: {
+        bodyParser: true,
+    },
+};
 
 export default async function handler(req, res) {
-    // Разрешаем CORS
+    // CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -12,22 +16,30 @@ export default async function handler(req, res) {
     }
     
     const API_SERVER = 'http://31.130.131.180:8001';
+    
+    // Извлекаем путь: /api/proxy/api/save_score → /api/save_score
     const path = req.url.replace('/api/proxy', '');
     const targetUrl = `${API_SERVER}${path}`;
     
     try {
-        const response = await fetch(targetUrl, {
+        const options = {
             method: req.method,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: req.method !== 'GET' ? JSON.stringify(req.body) : undefined
-        });
+            headers: { 'Content-Type': 'application/json' }
+        };
         
+        if (req.method === 'POST' && req.body) {
+            options.body = JSON.stringify(req.body);
+        }
+        
+        const response = await fetch(targetUrl, options);
         const data = await response.json();
-        res.status(response.status).json(data);
+        
+        return res.status(response.status).json(data);
     } catch (error) {
         console.error('Proxy error:', error);
-        res.status(500).json({ error: 'Proxy error', message: error.message });
+        return res.status(500).json({ 
+            error: 'Proxy error', 
+            message: error.message 
+        });
     }
 }
