@@ -378,6 +378,25 @@ body {
     opacity: 0.6;
 }
 
+.user-rank-info {
+    text-align: center;
+    padding: 20px;
+    margin-top: 15px;
+    background: var(--tg-theme-bg-color, #ffffff);
+    border-radius: 12px;
+    border: 2px dashed #667eea;
+}
+
+.user-rank-info p {
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.user-rank-info strong {
+    color: #667eea;
+    font-size: 1.3rem;
+}
+
 /* ===== АДАПТАЦИЯ ПОД ТЕМНУЮ ТЕМУ TELEGRAM ===== */
 @media (prefers-color-scheme: dark) {
     body {
