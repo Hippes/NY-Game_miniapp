@@ -11,9 +11,8 @@ let user = tg.initDataUnsafe?.user || {
 
 // ===== КОНФИГУРАЦИЯ API (ГЛОБАЛЬНАЯ ТАБЛИЦА) =====
 const API_CONFIG = {
-    enabled: true,  // ВЫКЛЮЧАТЕЛЬ: false = работает как раньше
-    url: "/api/proxy",
-    timeout: 5000
+    enabled: true,  // ВЫКЛЮЧАТЕЛЬ: false = локальная таблица
+    url: "https://31.130.131.180/api"  // API через Nginx SSL
 };
 
 // ===== КОНФИГУРАЦИЯ ИГРЫ =====
@@ -56,32 +55,34 @@ let gameState = {
 async function saveScore(score) {
     console.log('💾 Сохранение результата:', score);
     
-    // 1. ВСЕГДА сохраняем локально (как раньше)
+    // 1. ВСЕГДА сохраняем локально (резерв)
     saveScoreLocally(score);
     
-    // 2. ПРОБУЕМ отправить на сервер (если API включен)
+    // 2. Отправляем на сервер если API включен
     if (API_CONFIG.enabled) {
         try {
-            console.log('📡 Отправка на сервер...');
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
-            
-            const response = await fetch(`${API_CONFIG.url}/api/save_score`, {
+            const response = await fetch(`${API_CONFIG.url}/submit-score`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                },
                 body: JSON.stringify({
                     userId: user.id,
                     userName: user.first_name,
                     score: score
-                }),
-                signal: controller.signal
+                })
             });
-            
-            clearTimeout(timeoutId);
             
             if (response.ok) {
                 const result = await response.json();
                 console.log('✅ Результат сохранен на сервере:', result);
+                
+                // Показываем место в рейтинге
+                if (result.rank) {
+                    console.log(`🏆 Ваше место: ${result.rank}`);
+                }
+            } else {
+                console.warn('⚠️ Ошибка сервера, используем локальное хранение');
             }
         } catch (error) {
             console.log('⚠️ API недоступен, работаем локально');
@@ -89,10 +90,9 @@ async function saveScore(score) {
     }
 }
 
-// Локальное хранение (как раньше, без изменений)
+// Локальное сохранение (резерв)
 function saveScoreLocally(score) {
     const scores = getScores();
-    
     const existingIndex = scores.findIndex(s => s.userId === user.id);
     
     if (existingIndex !== -1) {
@@ -103,7 +103,6 @@ function saveScoreLocally(score) {
                 score: score,
                 date: new Date().toISOString()
             };
-            console.log(`Обновлен локальный рекорд: ${score}`);
         }
     } else {
         scores.push({
@@ -112,7 +111,6 @@ function saveScoreLocally(score) {
             score: score,
             date: new Date().toISOString()
         });
-        console.log(`Добавлен новый игрок локально: ${score}`);
     }
     
     scores.sort((a, b) => b.score - a.score);
@@ -449,16 +447,7 @@ async function showLeaderboard() {
     // Если API включен - загружаем с сервера
     if (API_CONFIG.enabled) {
         try {
-            console.log('📡 Загрузка глобальной таблицы...');
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
-            
-            const response = await fetch(
-                `${API_CONFIG.url}/api/leaderboard?user_id=${user.id}`,
-                { signal: controller.signal }
-            );
-            
-            clearTimeout(timeoutId);
+            const response = await fetch(`${API_CONFIG.url}/leaderboard?userId=${user.id}`);
             
             if (response.ok) {
                 const data = await response.json();
@@ -471,7 +460,7 @@ async function showLeaderboard() {
         }
     }
     
-    // Fallback: показываем локальные результаты
+    // Fallback: локальные результаты
     displayLocalLeaderboard();
 }
 
@@ -509,7 +498,7 @@ function displayGlobalLeaderboard(data) {
         leaderboardList.appendChild(item);
     });
     
-    // Если пользователь не в топ-50, показываем его место
+    // Если пользователь не в топ-50
     if (!data.userInTop && data.userRank) {
         const userInfo = document.createElement('div');
         userInfo.className = 'user-rank-info';
@@ -520,7 +509,7 @@ function displayGlobalLeaderboard(data) {
     }
 }
 
-// Показ локальной таблицы (как раньше)
+// Показ локальной таблицы (fallback)
 function displayLocalLeaderboard() {
     const scores = getScores();
     const leaderboardList = document.getElementById('leaderboard-list');
