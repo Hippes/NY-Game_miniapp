@@ -12,7 +12,7 @@ let user = tg.initDataUnsafe?.user || {
 // ===== КОНФИГУРАЦИЯ API (ГЛОБАЛЬНАЯ ТАБЛИЦА) =====
 const API_CONFIG = {
     enabled: true,  // ВЫКЛЮЧАТЕЛЬ: false = локальная таблица
-    url: "https://31.130.131.180/api"  // API через Nginx SSL
+    url: "https://game-api.dom-grafika.ru/api"
 };
 
 // ===== КОНФИГУРАЦИЯ ИГРЫ =====
