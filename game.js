@@ -19,8 +19,8 @@ const API_CONFIG = {
 const GAME_CONFIG = {
     duration: 45, // секунд (изменено с 60 на 45)
     spawnInterval: { min: 400, max: 900 }, // мс между появлениями
-    itemLifetime: { min: 3000, max: 5000 }, // время жизни предмета
-    maxItemsOnScreen: 12,
+    itemLifetime: { min: 3000, max: 6000 }, // время жизни предмета
+    maxItemsOnScreen: 10,
     
     items: {
         good: [
@@ -407,9 +407,9 @@ function showResults() {
         message = '💪 Неплохо для начала!';
     } else if (finalScore < 30) {
         message = '👍 Хороший результат!';
-    } else if (finalScore < 50) {
+    } else if (finalScore < 60) {
         message = '🔥 Отличная игра!';
-    } else if (finalScore < 70) {
+    } else if (finalScore < 75) {
         message = '⭐ Невероятно!';
     } else {
         message = '🏆 Вы легенда!';
@@ -440,7 +440,7 @@ function showResults() {
 // ===== ТАБЛИЦА ЛИДЕРОВ =====
 async function showLeaderboard() {
     const leaderboardList = document.getElementById('leaderboard-list');
-    leaderboardList.innerHTML = '<div class="loading">Загрузка...</div>';
+    leaderboardList.innerHTML = '<div class="loading">Загрузка данных...</div>';
     
     showScreen('leaderboard-screen');
     
